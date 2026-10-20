@@ -1,14 +1,16 @@
 OJTTrack: Core User Workflow
 
+
+
 1\. The coordinator creates a student account and provides the student with login access.
 
 2\. The student logs in and records the companies they plan to apply to.
 
 3\. The student updates each application as they apply, attend interviews, or receive a decision.
 
-4\. The coordinator monitors the student's progress and helps establish an OJT placement once an application is accepted.
+4\. The coordinator confirms that the student has an accepted application before creating an OJT placement with the company, role, training dates, and required hours.
 
-5\. The student records their daily attendance, working hours, and accomplishments.
+5\. The student checks their placement details and records their daily attendance, working hours, and accomplishments.
 
 6\. The coordinator reviews each submitted time log and either verifies it or returns it for correction.
 
@@ -16,7 +18,11 @@ OJTTrack: Core User Workflow
 
 8\. The coordinator verifies the corrected logs, and OJTTrack updates the student's total verified hours and remaining hours.
 
-Two things left out for now
+
+
+Two Things Left Out for Now
+
+
 
 \- Automated email notifications: Students and coordinators can use the core workflow without automatic emails.
 
