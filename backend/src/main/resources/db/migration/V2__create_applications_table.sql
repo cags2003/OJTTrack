@@ -12,7 +12,7 @@ CREATE TABLE applications (
                          status IN (
                              'PLANNED',
                              'APPLIED',
-                             'INTERVIEWED',
+                             'INTERVIEW',
                              'OFFERED',
                              'ACCEPTED',
                              'REJECTED',
