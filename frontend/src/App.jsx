@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react'
 
+const STATUSES = ['PLANNED', 'APPLIED', 'INTERVIEW', 'OFFERED', 'ACCEPTED', 'REJECTED', 'WITHDRAWN']
+
 function App() {
     const [applications, setApplications] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+
+    const [companyName, setCompanyName] = useState('')
+    const [status, setStatus] = useState('PLANNED')
+    const [formError, setFormError] = useState(null)
 
     useEffect(() => {
         fetch('/api/applications')
@@ -16,12 +22,58 @@ function App() {
             .finally(() => setLoading(false))
     }, [])
 
+    function handleSubmit(event) {
+        event.preventDefault()
+        setFormError(null)
+        fetch('/api/applications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ companyName, status }),
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error('Could not save (status ' + res.status + ')')
+                return res.json()
+            })
+            .then((saved) => {
+                setApplications((prev) => [...prev, saved])
+                setCompanyName('')
+            })
+            .catch((err) => setFormError(err.message))
+    }
+    function handleDelete(id) {
+        if (!window.confirm('Delete this application?')) return
+        fetch('/api/applications/' + id, { method: 'DELETE' })
+            .then((res) => {
+                if (!res.ok) throw new Error('Could not delete (status ' + res.status + ')')
+                setApplications((prev) => prev.filter((app) => app.id !== app))
+            })
+            .catch((err) => setFormError(err.message))
+    }
+
     if (loading) return <p>Loading...</p>
     if (error) return <p>Could not load applications: {error}</p>
 
     return (
         <div>
-            <h1> My Applications</h1>
+            <h1>My Applications</h1>
+
+            <form onSubmit={handleSubmit}>
+                <label htmlFor="company">Company name</label>
+                <input
+                    id="company"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                />
+                <label htmlFor="status">Status</label>
+                <select id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    {STATUSES.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                    ))}
+                </select>
+                <button type="submit">Add application</button>
+                {formError && <p>{formError}</p>}
+            </form>
+
             {applications.length === 0 ? (
                 <p>No applications yet.</p>
             ) : (
@@ -29,8 +81,10 @@ function App() {
                     {applications.map((app) => (
                         <li key={app.id}>
                             {app.companyName} — {app.status}
+                            <button onClick={() => handleDelete(app.id)}>Delete</button>
                         </li>
                     ))}
+
                 </ul>
             )}
         </div>
