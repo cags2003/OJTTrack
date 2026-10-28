@@ -40,16 +40,32 @@ function App() {
             })
             .catch((err) => setFormError(err.message))
     }
+
     function handleDelete(id) {
         if (!window.confirm('Delete this application?')) return
         fetch('/api/applications/' + id, { method: 'DELETE' })
             .then((res) => {
                 if (!res.ok) throw new Error('Could not delete (status ' + res.status + ')')
-                setApplications((prev) => prev.filter((app) => app.id !== app))
+                setApplications((prev) => prev.filter((app) => app.id !== id))
             })
             .catch((err) => setFormError(err.message))
     }
 
+    function handleStatusChange(app, newStatus) {
+        fetch('/api/applications/' + app.id, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ companyName: app.companyName, status: newStatus }),
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error('Could not update (status ' + res.status + ')')
+                return res.json()
+            })
+            .then((updated) => {
+                setApplications((prev) => prev.map((a) => (a.id === updated.id ? updated : a)))
+            })
+            .catch((err) => setFormError(err.message))
+    }
     if (loading) return <p>Loading...</p>
     if (error) return <p>Could not load applications: {error}</p>
 
@@ -80,7 +96,15 @@ function App() {
                 <ul>
                     {applications.map((app) => (
                         <li key={app.id}>
-                            {app.companyName} — {app.status}
+                            {app.companyName}{' '}
+                            <select
+                                value={app.status}
+                                onChange={(e) => handleStatusChange(app, e.target.value)}
+                            >
+                                {STATUSES.map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
                             <button onClick={() => handleDelete(app.id)}>Delete</button>
                         </li>
                     ))}
